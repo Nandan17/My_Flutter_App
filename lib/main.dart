@@ -19,7 +19,8 @@ void main() {
       home: const Homepage(),
       routes: {
         '/login/': (context) => const LoginView(),
-        '/register/': (context) => const RegisterView()
+        '/register/': (context) => const RegisterView(),
+        '/notes/': ((context) => const NotesView())
       },
      ),
   );
@@ -41,16 +42,16 @@ class Homepage extends StatelessWidget {
                 final user = FirebaseAuth.instance.currentUser;
                 if(user != null){
                   //these are the lines to uncomment
-                  // if(user.emailVerified){
-                  //   print('email varified');
-                  //   return const NotesView();
-                  // }else{
-                  //   return const VarifyEmailView();
-                  // }
+                  if(user.emailVerified){
+                     devtools.log('email varified');
+                     return const NotesView();
+                   }else{
+                     return const VarifyEmailView();
+                   }
                 }else{
                     return const LoginView();
                 }
-                return const NotesView();
+                //return const NotesView();
           //       print(user);
           //       if(user?.emailVerified ?? false){
           //         return const Text('Done');

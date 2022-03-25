@@ -21,7 +21,7 @@ class _VarifyEmailViewState extends State<VarifyEmailView> {
               final user = FirebaseAuth.instance.currentUser;
               user?.sendEmailVerification();
               },
-              child: Text('Send email varification'),
+              child:const Text('Send email varification'),
            )
         ],
       ),
