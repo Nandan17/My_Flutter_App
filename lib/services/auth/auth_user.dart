@@ -3,15 +3,21 @@ import 'package:flutter/foundation.dart';
 
 @immutable //it is an annotation any class any subclasses of this will be immutable
 class AuthUser {
+  final String? email;
   final bool isEmailVarified;
+   //constructor
+  const AuthUser({
+    required this.email,
+    required this.isEmailVarified,
+  });
 
-  const AuthUser({required this.isEmailVarified}); //constructor
+  factory AuthUser.fromFirebase(User user) => AuthUser(
+    email: user.email,
+    isEmailVarified: user.emailVerified,
+    );
 
-  factory AuthUser.fromFirebase(User user) =>
-     AuthUser(isEmailVarified: user.emailVerified);
-
-  void testing() {
-    AuthUser(isEmailVarified:true);
-  }
+  //void testing() {
+    //AuthUser(isEmailVarified:true);
+  //}
 }
 

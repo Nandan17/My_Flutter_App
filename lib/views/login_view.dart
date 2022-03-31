@@ -53,7 +53,7 @@ class _LoginViewState extends State<LoginView> {
                   enableSuggestions: false,
                   autocorrect: false,
                   decoration: const InputDecoration(
-                    hintText: 'Enter your email here'
+                    hintText: 'Enter your password here'
                   ),
                 ),
                 TextButton(
