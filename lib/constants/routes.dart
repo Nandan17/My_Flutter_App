@@ -4,3 +4,4 @@ const loginRoute = '/login/';
 const registerRoute = '/register/';
 const notesRoute = '/notes/';
 const varifyEmailRoute = '/varify-email/';
+const newNoteRoute = '/notes/new-note/';
