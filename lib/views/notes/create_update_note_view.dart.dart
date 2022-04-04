@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
 import 'package:mynotes/services/crud/notes_service.dart';
+import 'package:mynotes/utilities/generics/get_arguments.dart';
 
-class NewNoteView extends StatefulWidget {
-  const NewNoteView({ Key? key }) : super(key: key);
+class CreateUpdateNoteView extends StatefulWidget {
+  const CreateUpdateNoteView({ Key? key }) : super(key: key);
 
   @override
-  State<NewNoteView> createState() => _NewNoteViewState();
+  State<CreateUpdateNoteView> createState() => _CreateUpdateNoteViewState();
 }
 
-class _NewNoteViewState extends State<NewNoteView> {//previously every time we do hot reload a new note will be created to avoid that we will create _note to keep track of existing notes
+class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {//previously every time we do hot reload a new note will be created to avoid that we will create _note to keep track of existing notes
   DatabaseNote? _note;//it will keep hold of our current note in new_note_view.dart
   late final NotesService _notesService; //keep reference to NotesService
   late final TextEditingController _textController; //this is to track text changes
@@ -40,7 +41,17 @@ class _NewNoteViewState extends State<NewNoteView> {//previously every time we d
     _textController.addListener(_textControllerListener);
   }
 
-  Future<DatabaseNote> createNewNote() async {//check for if the note is already exist if yes return the existing note else create a new notwe
+  Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {//check for if the note is already exist if yes return the existing note else create a new notwe
+    
+    //we need a generic way of extracting arguments from the BuildContext
+    final widgetNote = context.getArgument<DatabaseNote>();   
+
+    if(widgetNote != null){//in update note we need to populate with pre existing information
+      _note = widgetNote;
+      _textController.text = widgetNote.text;
+      return widgetNote;
+    }
+
     final existingNote = _note;
     if(existingNote != null){
       return existingNote;
@@ -48,7 +59,9 @@ class _NewNoteViewState extends State<NewNoteView> {//previously every time we d
     final currentUser = AuthService.firebase().currentUser;
     final email = currentUser!.email!;
     final owner = await _notesService.getUser(email: email);
-    return await _notesService.createNote(owner: owner);
+    final newNote = await _notesService.createNote(owner: owner);
+    _note = newNote;
+    return newNote;
   }
 
   //Upon disposal, we need to delete the note if text is empty
@@ -86,11 +99,10 @@ class _NewNoteViewState extends State<NewNoteView> {//previously every time we d
         title: const Text('new Note')
       ),
       body: FutureBuilder(
-        future: createNewNote(),//this function gets called
+        future: createOrGetExistingNote(context),//this function gets called
         builder: (context, snapshot) {
           switch(snapshot.connectionState){
             case ConnectionState.done:
-              _note = snapshot.data as DatabaseNote;
               _setupTextControllerListener();
               return TextField(
                 controller: _textController,
