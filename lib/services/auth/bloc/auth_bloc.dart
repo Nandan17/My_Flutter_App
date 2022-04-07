@@ -11,10 +11,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = provider.currentUser;
       if (user == null) {
         emit(
-          const AuthStateLoggedOut(),
+          const AuthStateLoggedOut(null),
         );
       } else if (!user.isEmailVarified) {
-        emit(const AuthStateNeedsVerification());
+        emit(const AuthStateNeedsVerification(null));
       } else {
         emit(AuthStateLoggedIn(user));
       }
@@ -22,8 +22,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     // log in
     on<AuthEventLogIn>((event, emit) async {
-      emit(const AuthStateLoading());
-
       final email = event.email;
       final password = event.password;
       try {
@@ -33,7 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         emit(AuthStateLoggedIn(user));
       } on Exception catch (e) {
-        emit(AuthStateLoginFailure(e));
+        emit(AuthStateLoggedOut(e));
       }
     });
 
@@ -43,7 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         await provider.logout();
         emit(
-          const AuthStateLoggedOut(),
+          const AuthStateLoggedOut(null),
         );
       } on Exception catch (e) {
         emit(AuthStateLogoutFailure(e));
